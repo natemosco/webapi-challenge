@@ -4,10 +4,9 @@ const project = require("../helpers/projectModel");
 const actions = require("../helpers/actionModel");
 
 const actionRouter = express.Router();
-const data = require("../dbConfig");
 
 // Custom Middleware
-function validateId(req, res, next){
+function validateActionId(req, res, next){
     actions
     .get.(req.params.id)
         .then( singleUser=> {
@@ -19,17 +18,27 @@ function validateId(req, res, next){
             }
         })
         .catch(error => {
-            res.status(500).json({ errorMessage: 'internal error, could not get action by Id '});
+            res.status(500).json({ errorMessage: 'internal error, could not locate action by Id. Is the id for this action correct?'});
         });
 }
-
+function validateActionBody(req, res, next){
+    if(Object.keys(req.body).length === 0){
+        req.status(400).json({errorMessage: "missing data for action body"});
+    } else if(!req.body.notes || !req.body.description) {
+        res.status(400).json({errorMessage: "notes and description are required"})
+    } else if( typeof req.body.notes !== string || typeof req.body.description !== string) {
+        res.status(400).json({errorMessage: "notes and description required to be type: string"});
+    } else {
+        next();
+    };
+};
 
 actionRouter.get('/', (req, res) => {
     actions
         .get()
-        .then(action => {
+        .then(allActions => {
             //console.log(action, 'response from GET /');
-            res.status(200).json(action);
+            res.status(200).json(allActions);
         })
         .catch(error => {
             console.log(error, 'Error from get /');
@@ -37,7 +46,7 @@ actionRouter.get('/', (req, res) => {
         });
 });
 
-actionRouter.get('/:id', validateId, (req, res) => {
+actionRouter.get('/:id', validateActionId, (req, res) => {
     actions
         .get(req.params.id)
         .then(singleAction => {
@@ -50,7 +59,34 @@ actionRouter.get('/:id', validateId, (req, res) => {
         });
 });
 
+actionRouter.delete('/:id', validateActionId, (req, res) => {
+    actions
+        .delete()
+        .then(deletedAction => {
+            actions.get().then(allActions =>{
+                res.status(200).json(deletedAction, allActions);
+            });
+        })
+        .catch(error => {
+            console.log(error, 'Error from get /');
+            res.status(500).json({ errorMessage: 'internal error deleting action'});
+        });
+});
 
+actionRouter.put('/:id', [validateActionId, validateActionBody], (req, res) => {
+    actions
+        .update(req.params.id, req.params.body)
+        .then(updatedAction => {
+            //console.log(updatedAction, 'response from PUT /:id');
+            actions.get().then(allActions => {
+                res.status(200).json(updatedAction, allActions);
+            })
+        })
+        .catch(error => {
+            console.log(error, 'Error from get /:id');
+            res.status(500).json({ errorMessage: 'internal error updating specified action'});
+        });
+});
 
 
 
