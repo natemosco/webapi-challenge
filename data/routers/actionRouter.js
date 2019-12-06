@@ -47,6 +47,8 @@ function validateProjectId(req, res, next){
         res.status(500).json({ errorMessage: 'internal error, could not complete request'});
     });
 }
+
+// Endpoints
 actionRouter.get('/', (req, res) => {
     actions
         .get()
