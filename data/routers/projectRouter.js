@@ -7,7 +7,7 @@ const projectRouter = express.Router();
 
 // Middleware
 function validateProjectId(req, res, next) {
-  project
+  projects
     .get(req.params.id)
     .then(project => {
       if (!project) {
@@ -34,11 +34,9 @@ function validateProjectBody(req, res, next) {
     typeof req.body.name !== string ||
     typeof req.body.description !== string
   ) {
-    res
-      .status(400)
-      .json({
-        errorMessage: "name and description required to be type: string"
-      });
+    res.status(400).json({
+      errorMessage: "name and description required to be type: string"
+    });
   } else {
     next();
   }
