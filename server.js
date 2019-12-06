@@ -19,4 +19,11 @@ server.use(globalMiddleware);
 server.use("/api/projects", projectsRouter);
 server.use("/api/actions", actionsRouter);
 
+server.get("/", (req, res) => {
+  console.log("Welcome to Node Sprint 1 web-api-challenge");
+  res
+    .status(200)
+    .json({ message: "Welcome to Node Sprint 1 web-api-challenge" });
+});
+
 module.exports = server;

@@ -31,8 +31,8 @@ function validateProjectBody(req, res, next) {
   } else if (!req.body.name || !req.body.description) {
     res.status(400).json({ errorMessage: "name and description are required" });
   } else if (
-    typeof req.body.name !== string ||
-    typeof req.body.description !== string
+    typeof req.body.name !== "string" ||
+    typeof req.body.description !== "string"
   ) {
     res.status(400).json({
       errorMessage: "name and description required to be type: string"

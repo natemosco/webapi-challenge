@@ -22,6 +22,7 @@ function validateActionId(req, res, next) {
         .json({ errorMessage: "internal error, could not process request." });
     });
 }
+
 function validateActionBody(req, res, next) {
   if (Object.keys(req.body).length === 0) {
     req.status(400).json({ errorMessage: "missing data for action body" });
@@ -30,29 +31,26 @@ function validateActionBody(req, res, next) {
       .status(400)
       .json({ errorMessage: "notes and description are required" });
   } else if (
-    typeof req.body.notes !== string ||
-    typeof req.body.description !== string
+    typeof req.body.notes !== "string" ||
+    typeof req.body.description !== "string"
   ) {
-    res
-      .status(400)
-      .json({
-        errorMessage: "notes and description required to be type: string"
-      });
+    res.status(400).json({
+      errorMessage: "notes and description required to be type: string"
+    });
   } else {
     next();
   }
 }
+
 function validateProjectId(req, res, next) {
   project
     .get(req.params.id)
     .then(project => {
       if (!project) {
-        res
-          .status(404)
-          .json({
-            errorMessage:
-              "Project by this Id does not exist. actions cannot be added without corresponding project."
-          });
+        res.status(404).json({
+          errorMessage:
+            "Project by this Id does not exist. actions cannot be added without corresponding project."
+        });
       } else {
         next();
       }
@@ -95,22 +93,29 @@ actionRouter.get("/:id", validateActionId, (req, res) => {
     });
 });
 
-actionRouter.post("/", [validateProjectId, validateActionBody], (req, res) => {
-  const newAction = { ...req.body, project_id: req.params.id };
-  actions
-    .insert(newAction)
-    .then(action => {
-      res.status(200).json(action);
-    })
-    .catch(error => {
-      console.log(error, "Error from POST /:id");
-      res.status(500).json({ errorMessage: "internal error processing POST" });
-    });
-});
+actionRouter.post(
+  "/:id",
+  [validateProjectId, validateActionBody],
+  (req, res) => {
+    const id = Number(req.params.id);
+    const newAction = { ...req.body, project_id: id };
+    actions
+      .insert(newAction)
+      .then(action => {
+        res.status(200).json(action);
+      })
+      .catch(error => {
+        console.log(error, "Error from POST /:id");
+        res
+          .status(500)
+          .json({ errorMessage: "internal error processing POST" });
+      });
+  }
+);
 
 actionRouter.delete("/:id", validateActionId, (req, res) => {
   actions
-    .delete()
+    .remove(req.params.id)
     .then(deletedAction => {
       actions.get().then(allActions => {
         res.status(200).json(deletedAction, allActions);
@@ -124,7 +129,7 @@ actionRouter.delete("/:id", validateActionId, (req, res) => {
 
 actionRouter.put("/:id", [validateActionId, validateActionBody], (req, res) => {
   actions
-    .update(req.params.id, req.params.body)
+    .update(Number(req.params.id), req.body)
     .then(updatedAction => {
       //console.log(updatedAction, 'response from PUT /:id');
       actions.get().then(allActions => {
