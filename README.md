@@ -39,14 +39,24 @@ Commit your code regularly and use descriptive messages. This helps both you (in
 Demonstrate your understanding of this Sprint's concepts by answering the following free-form questions. Edit this document to include your answers after each question. Make sure to leave a blank line above and below your answer so it is clear and easy to read by your Team Lead.
 
 - [ ] Mention two parts of Express that you learned about this week.
-
+  - Express is a framework that replaces react for backend purposes.
+  - similar to packages provided by react express adds routing, middleware, and api support
 - [ ] Describe Middleware?
 
-- [ ] Describe a Resource?
+  - Middleware is just a function or group of functions that intercept, read, document, modify or let pass unchanged the request entering the api.
+  - The most popular middleware include loggers to document api calls, and security middleware that protect the api by changing what is sent in the response data.
 
+- [ ] Describe a Resource?
+  - Well... everything is a resource.
+  - each endpoint is a resource that returns data which is itself a resource to build with.
 - [ ] What can the API return to help clients know if a request was successful?
 
+  - A status code is required to indicate success, denied, error, incomplete etc.
+  - 200 is a successful response code.
+
 - [ ] How can we partition our application into sub-applications?
+  - this can be done with setting up a file structure that uses the import of multiple routers.
+  - the routers can be setup in a resource structure pattern or organized by type.
 
 ## Minimum Viable Product
 
